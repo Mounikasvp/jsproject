@@ -1,0 +1,102 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up - Culinary Canvas</title>
+    <link rel="stylesheet" href="index.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+</head>
+<body>
+    <div class="auth-container">
+        <form class="auth-form" id="signupForm">
+            <h2>Create Account</h2>
+            <div class="input-group">
+                <label for="signupName"><b>Full Name</b></label>
+                <input type="text" id="signupName" required>
+            </div>
+            <div class="input-group">
+                <label for="signupEmail"><b>Email</b></label>
+                <input type="email" id="signupEmail" required>
+            </div>
+            <div class="input-group">
+                <label for="signupPassword"><b>Password<b></label>
+                <input type="password" id="signupPassword" required>
+            </div>
+            <button type="submit" class="cta-button">Sign Up</button>
+            <p>Already have an account? <a href="login.html">Login</a></p>
+        </form>
+    </div>
+
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyDmYXy4OGpK_BwJ_26f4W4azKDZDICWR3w",
+            authDomain: "emaillogin-d9312.firebaseapp.com",
+            projectId: "emaillogin-d9312",
+            storageBucket: "emaillogin-d9312.firebasestorage.app",
+            messagingSenderId: "490730052655",
+            appId: "1:490730052655:web:5533571f2948710781bada",
+            measurementId: "G-TE5EVPJVM6"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+
+        // Get references to services
+        const auth = firebase.auth(); 
+        const db = firebase.firestore();
+
+        document.getElementById('signupForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Get input values
+            const name = document.getElementById('signupName').value;
+            const email = document.getElementById('signupEmail').value;
+            const password = document.getElementById('signupPassword').value;
+
+            // Create user with Firebase Authentication
+            auth.createUserWithEmailAndPassword(email, password)
+                .then((userCredential) => {
+                    // Get the newly created user
+                    const user = userCredential.user;
+
+                    // Store additional user info in Firestore
+                    return db.collection('users').doc(user.uid).set({
+                        name: name,
+                        email: email,
+                        password:password,
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                }) .then(() => {
+                    // Show success message
+                    Swal.fire({
+                        title: "Account Created!",
+                        text: "Your account has been successfully created.",
+                        icon: "success",
+                        confirmButtonColor: "#ff6b6b"
+                    }).then(() => {
+                        // Redirect to login page
+                        window.location.href = 'login.html';
+                    });
+                })
+                .catch((error) => {
+                    // Handle Errors here
+                    Swal.fire({
+                        title: "Sign Up Error",
+                        text: error.message,
+                        icon: "error",
+                        confirmButtonColor: "#ff6b6b"
+                    });
+                });
+        });
+               
+        
+    </script>
+</body>
+</html>

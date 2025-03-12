@@ -1,0 +1,1188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Culinary Canvas</title>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+    
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            background-color: #f5f5f5;
+        }
+    
+        .nav {
+            background: #ff6b6b;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+    
+        .logo {
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+    
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            margin-left: 20px;
+            padding: 8px 16px;
+            border-radius: 20px;
+            transition: background-color 0.3s;
+        }
+    
+        .nav-links a:hover {
+            background-color: rgba(255,255,255,0.2);
+        }
+    
+        .search-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin: 20px auto;
+            display: flex;
+            gap: 10px;
+            max-width: 600px;
+        }
+    
+        #searchBar {
+            flex: 1;
+            padding: 12px 20px;
+            border: 2px solid #eee;
+            border-radius: 25px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+            outline: none;
+        }
+    
+        #searchBar:focus {
+            border-color: #ff6b6b;
+        }
+    
+        #searchBtn {
+            padding: 12px 25px;
+            background-color: #ff6b6b;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: transform 0.2s;
+        }
+    
+        #searchBtn:hover {
+            transform: translateY(-2px);
+            background-color: #ff5252;
+        }
+    
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            backdrop-filter: blur(5px);
+        }
+    
+        .modal-content {
+            background-color: white;
+            margin: 5% auto;
+            width: 90%;
+            max-width: 900px;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+            position: relative;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+    
+        .recipe-details {
+            padding: 30px;
+        }
+    
+        .recipe-title {
+            font-size: 2rem;
+            color: #333;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #ff6b6b;
+            padding-bottom: 10px;
+        }
+    
+        .modal-image {
+            width: 100%;
+            height: 300px;
+            overflow: hidden;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+    
+        .modal-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .button-group {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+.explore-btn,
+.edit-btn,
+.delete-btn {
+    flex: 1;
+    padding: 8px;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    transition: background-color 0.3s ease, transform 0.3s ease;
+    font-weight: 600;
+}
+
+.explore-btn {
+    background-color: #ff6b6b;
+    color: white;
+}
+
+.edit-btn {
+    background-color: #4CAF50;
+    color: white;
+}
+
+.delete-btn {
+    background-color: #f44336;
+    color: white;
+}
+
+.explore-btn:hover,
+.edit-btn:hover,
+.delete-btn:hover {
+    transform: scale(1.05);
+    opacity: 0.9;
+}
+
+.explore-btn:active,
+.edit-btn:active,
+.delete-btn:active {
+    transform: scale(1);
+}
+    
+        .recipe-section {
+            margin: 20px 0;
+            padding: 20px;
+            background-color: #f8f8f8;
+            border-radius: 10px;
+        }
+    
+        .recipe-section h4 {
+            color: #ff6b6b;
+            margin-bottom: 15px;
+        }
+    
+        .ingredients-list {
+            list-style-type: none;
+            padding: 0;
+            margin: 20px 0;
+            columns: 2;
+            gap: 20px;
+        }
+    
+        .ingredients-list li {
+            padding: 8px 0 8px 25px;
+            position: relative;
+            break-inside: avoid;
+        }
+    
+        .ingredients-list li:before {
+            content: "•";
+            position: absolute;
+            left: 8px;
+            color: #ff6b6b;
+        }
+    
+        .instructions-list {
+            list-style-type: none;
+            padding: 0;
+            margin: 20px 0;
+            counter-reset: step-counter;
+        }
+    
+        .instructions-list li {
+            padding: 12px 0 12px 35px;
+            position: relative;
+            margin-bottom: 10px;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+    
+        .instructions-list li:before {
+            content: counter(step-counter);
+            counter-increment: step-counter;
+            position: absolute;
+            left: 8px;
+            font-weight: bold;
+            color: #ff6b6b;
+        }
+    
+        .video-container {
+            position: relative;
+            padding-bottom: 56.25%;
+            height: 0;
+            overflow: hidden;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+    
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+    
+        .feedback-display {
+            padding: 25px;
+            border-radius: 10px;
+            margin-top: 30px;
+        }
+    
+        .average-rating {
+            text-align: center;
+            padding: 20px;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ff8e8e 100%);
+            color: white;
+            border-radius: 10px;
+            margin-bottom: 25px;
+        }
+    
+        .feedback-list {
+            max-height: 400px;
+            overflow-y: auto;
+            padding: 10px;
+        }
+    
+        .feedback-item {
+            background-color: #f8f8f8;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #ff6b6b;
+            transition: transform 0.2s;
+        }
+    
+        .feedback-section {
+            background-color: #f8f8f8;
+            padding: 25px;
+            border-radius: 10px;
+            margin-top: 30px;
+        }
+    
+        #feedbackInput {
+            width: 100%;
+            height: 100px;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            resize: none;
+            margin-bottom: 15px;
+            transition: border-color 0.3s;
+        }
+    
+        .rating {
+            display: flex;
+            flex-direction: row-reverse;
+            justify-content: flex-end;
+            gap: 5px;
+            margin: 15px 0;
+        }
+    
+        .rating span {
+            font-size: 30px;
+            color: #ddd;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+    
+        .rating span.selected {
+            color: #ffd700;
+        }
+    
+        #submitFeedback {
+            background-color: #ff6b6b;
+            color: white;
+            padding: 12px 25px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            width: 100%;
+        }
+    
+        .close-btn {
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            font-size: 28px;
+            font-weight: bold;
+            color: #999;
+            cursor: pointer;
+            transition: color 0.3s;
+            z-index: 1;
+        }
+    
+        .recipe-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 25px;
+            padding: 20px;
+        }
+    
+        .recipe-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s;
+        }
+    
+        .recipe-image {
+            height: 200px;
+            overflow: hidden;
+        }
+    
+        .recipe-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+    
+        .recipe-content {
+            padding: 20px;
+        }
+    
+        .recipe-stats {
+            display: flex;
+            gap: 15px;
+            margin: 10px 0;
+            color: #666;
+        }
+        .explore-btn {
+            background-color: #ff6b6b;
+            color: white;
+            padding: 10px;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        .explore-btn:hover {
+            background-color: #ff4747;
+            transform: scale(1.1); /* Slightly enlarge the button on hover */
+        }
+
+        .explore-btn:active {
+            transform: scale(1); /* Return to normal size when clicked */
+        }
+
+    
+        @media (max-width: 768px) {
+            .modal-content {
+                width: 95%;
+                margin: 2% auto;
+            }
+    
+            .ingredients-list {
+                columns: 1;
+            }
+    
+            .recipe-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            }
+    
+            .search-container {
+                flex-direction: column;
+            }
+    
+            #searchBtn {
+                width: 100%;
+            }
+        }
+        /* Add these styles to your existing CSS */
+.edit-form {
+    padding: 20px;
+}
+
+.edit-form h2 {
+    color: #333;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #ff6b6b;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #555;
+    font-weight: 500;
+}
+
+.form-group input,
+.form-group textarea {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: border-color 0.3s;
+}
+
+.form-group textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+.form-group input:focus,
+.form-group textarea:focus {
+    border-color: #ff6b6b;
+    outline: none;
+}
+
+.update-btn {
+    background-color: #4CAF50;
+    color: white;
+    padding: 12px 25px;
+    border: none;
+    border-radius: 25px;
+    cursor: pointer;
+    font-weight: 600;
+    width: 100%;
+    transition: background-color 0.3s;
+}
+
+.update-btn:hover {
+    background-color: #45a049;
+}
+.recipe-card {
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .recipe-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+        .button-group button {
+            transition: background-color 0.3s, transform 0.3s;
+        }
+        .button-group button:hover {
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <nav class="nav">
+            <div class="logo">Culinary Canvas</div>
+            <div class="nav-links">
+                    <a href="#" onclick="switchToAllRecipes()">All Recipes</a>
+                    <a href="#" onclick="switchToUserRecipes()">My Recipes</a>
+                    <a href="add-recipe.html">Add Recipe</a>
+                    <a href="#" onclick="logout()">Logout</a>
+                </div>
+            </div>
+        </nav>
+        <div class="dashboard-header">
+            <div class="search-container">
+                <input type="text" id="searchBar" placeholder="Search recipes by name..." oninput="filterRecipes()">
+                <button id="searchBtn" onclick="filterRecipes()">Search</button>
+            </div>
+        </div>
+        <div class="recipe-grid" id="recipeGrid">
+            <!-- Recipes will be dynamically inserted here -->
+        </div>
+
+        <div id="recipeModal" class="modal">
+            <div class="modal-content">
+                <span class="close-btn" onclick="closeModal()">&times;</span>
+                <div id="modalContent">
+                    <!-- Recipe details will be dynamically inserted here -->
+                </div>
+                <div class="feedback-display">
+                    <h3>Recipe Feedback</h3>
+                    <div class="average-rating">
+                        <p>Average Rating: <span id="avgRating">0</span>/5 ⭐</p>
+                        <p>Total Reviews: <span id="totalReviews">0</span></p>
+                    </div>
+                    <div id="feedbackList" class="feedback-list">
+                        <!-- Existing feedback will be displayed here -->
+                    </div>
+                </div>
+                <div class="feedback-section">
+                    <h3>Leave Your Feedback</h3>
+                    <textarea id="feedbackInput" placeholder="Write your feedback here..."></textarea>
+                    <div class="rating">
+                        <span onclick="rateRecipe(1)">&#9733;</span>
+                        <span onclick="rateRecipe(2)">&#9733;</span>
+                        <span onclick="rateRecipe(3)">&#9733;</span>
+                        <span onclick="rateRecipe(4)">&#9733;</span>
+                        <span onclick="rateRecipe(5)">&#9733;</span>
+                    </div>
+                    <button id="submitFeedback" onclick="submitFeedback()">Submit Feedback</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Add this HTML right before the closing body tag -->
+<div id="editModal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeEditModal()">&times;</span>
+        <div class="edit-form">
+            <h2>Edit Recipe</h2>
+            <form id="editRecipeForm" onsubmit="updateRecipe(event)">
+                <div class="form-group">
+                    <label for="editName">Recipe Name</label>
+                    <input type="text" id="editName" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="editDescription">Description</label>
+                    <textarea id="editDescription" required></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="editIngredients">Ingredients (comma-separated)</label>
+                    <textarea id="editIngredients" required></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="editInstructions">Instructions</label>
+                    <textarea id="editInstructions" required></textarea>
+                </div>
+                
+                <div class="form-group">
+                    <label for="editImage">Image URL</label>
+                    <input type="url" id="editImage" required>
+                </div>
+                
+                <div class="form-group">
+                    <label for="editVideo">YouTube Video URL (optional)</label>
+                    <input type="url" id="editVideo">
+                </div>
+                
+                <button type="submit" class="update-btn">Update Recipe</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+    <script>
+        // Firebase Configuration
+const firebaseConfig = {
+    apiKey: "AIzaSyDmYXy4OGpK_BwJ_26f4W4azKDZDICWR3w",
+    authDomain: "emaillogin-d9312.firebaseapp.com",
+    projectId: "emaillogin-d9312",
+    storageBucket: "emaillogin-d9312.firebasestorage.app",
+    messagingSenderId: "490730052655",
+    appId: "1:490730052655:web:5533571f2948710781bada",
+    measurementId: "G-TE5EVPJVM6"
+};
+
+// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const auth = firebase.auth();
+
+let currentUser = null;
+let recipes = [];
+
+// Authentication State Observer
+auth.onAuthStateChanged((user) => {
+            if (user) {
+                currentUser = user;
+                fetchAllRecipes(); // Initially show all recipes
+                fetchUserRecipes(); // Also fetch user's recipes
+            } else {
+                window.location.href = 'index.html';
+            }
+        });
+
+// function calculateAverageRating(recipe) {
+//     if (!recipe.feedback || recipe.feedback.length === 0) return 0;
+//     const sum = recipe.feedback.reduce((acc, curr) => acc + curr.rating, 0);
+//     return sum / recipe.feedback.length;
+// }
+
+
+function fetchUserRecipes() {
+    if (!currentUser) return;
+    
+    db.collection('recipes')
+        .where('user.uid', '==', currentUser.uid)
+        .get()
+        .then((querySnapshot) => {
+            userRecipes = querySnapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            }));
+            renderRecipes(userRecipes);
+        })
+        .catch((error) => {
+            Swal.fire({
+                title: 'Error',
+                text: 'Failed to fetch user recipes: ' + error.message,
+                icon: 'error',
+                confirmButtonColor: '#ff6b6b'
+            });
+        });
+}
+
+
+function renderRecipes(recipesToDisplay) {
+    const grid = document.getElementById('recipeGrid');
+    grid.innerHTML = '';
+
+    recipesToDisplay.forEach(recipe => {
+        const avgRating = calculateAverageRating(recipe);
+        const card = document.createElement('div');
+        card.className = 'recipe-card';
+        card.innerHTML = `
+            <div class="recipe-image">
+                <img src="${recipe.image}" alt="${recipe.name}">
+            </div>
+            <div class="recipe-content">
+                <h3>${recipe.name}</h3>
+                <p>Category:${recipe.category}</p>
+                <p>${recipe.description}</p>
+                <div class="recipe-stats">
+                    <span>⭐ ${avgRating.toFixed(1)}</span>
+                    <span>${recipe.feedback ? recipe.feedback.length : 0} reviews</span>
+                </div>
+                <div class="button-group">
+                    <button class="explore-btn" onclick="exploreRecipe('${recipe.id}')">Explore</button>
+                    <button class="edit-btn" onclick="editRecipe('${recipe.id}')">Edit</button>
+                    <button class="delete-btn" onclick="deleteRecipe('${recipe.id}')">Delete</button>
+                </div>
+            </div>
+        `;
+        grid.appendChild(card);
+    });
+}
+
+function editRecipe(recipeId) {
+    const recipe = [...allRecipes, ...userRecipes].find(r => r.id === recipeId);
+    
+    if (!recipe) {
+        Swal.fire({
+            title: 'Error',
+            text: 'Recipe not found',
+            icon: 'error',
+            confirmButtonColor: '#ff6b6b'
+        });
+        return;
+    }
+
+    // Check if the current user is the owner of the recipe
+    if (recipe.user?.uid !== currentUser.uid) {
+        Swal.fire({
+            title: 'Unauthorized',
+            text: 'You can only edit your own recipes',
+            icon: 'warning',
+            confirmButtonColor: '#ff6b6b'
+        });
+        return;
+    }
+    
+    document.getElementById('editName').value = recipe.name;
+    document.getElementById('editDescription').value = recipe.description;
+    document.getElementById('editIngredients').value = recipe.ingredients;
+    document.getElementById('editInstructions').value = recipe.instructions;
+    document.getElementById('editImage').value = recipe.image;
+    document.getElementById('editVideo').value = recipe.video || '';
+    
+    document.getElementById('editRecipeForm').dataset.recipeId = recipeId;
+    document.getElementById('editModal').style.display = 'block';
+}
+
+
+function updateRecipe(event) {
+    event.preventDefault();
+    
+    const recipeId = event.target.dataset.recipeId;
+    const recipeRef = db.collection('recipes').doc(recipeId);
+    
+    const updatedRecipe = {
+        name: document.getElementById('editName').value,
+        description: document.getElementById('editDescription').value,
+        ingredients: document.getElementById('editIngredients').value,
+        instructions: document.getElementById('editInstructions').value,
+        image: document.getElementById('editImage').value,
+        video: document.getElementById('editVideo').value || null,
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+    };
+    
+    recipeRef.update(updatedRecipe)
+        .then(() => {
+            // Update both arrays
+            [allRecipes, userRecipes].forEach(recipeArray => {
+                const index = recipeArray.findIndex(r => r.id === recipeId);
+                if (index !== -1) {
+                    recipeArray[index] = { ...recipeArray[index], ...updatedRecipe };
+                }
+            });
+            
+            closeEditModal();
+            renderRecipes(document.querySelector('.nav-links a.active').id === 'userRecipesBtn' ? userRecipes : allRecipes);
+            
+            Swal.fire({
+                title: 'Success!',
+                text: 'Recipe updated successfully',
+                icon: 'success',
+                confirmButtonColor: '#ff6b6b'
+            });
+        })
+        .catch((error) => {
+            Swal.fire({
+                title: 'Error',
+                text: 'Failed to update recipe: ' + error.message,
+                icon: 'error',
+                confirmButtonColor: '#ff6b6b'
+            });
+        });
+}
+function deleteRecipe(recipeId) {
+    Swal.fire({
+        title: 'Are you sure?',
+        text: "You won't be able to revert this!",
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#ff6b6b',
+        cancelButtonColor: '#808080',
+        confirmButtonText: 'Yes, delete it!'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            db.collection('recipes').doc(recipeId).delete()
+                .then(() => {
+                    fetchUserRecipes();
+                    Swal.fire({
+                        title: 'Deleted!',
+                        text: 'Your recipe has been deleted.',
+                        icon: 'success',
+                        confirmButtonColor: '#ff6b6b'
+                    });
+                })
+                .catch((error) => {
+                    Swal.fire({
+                        title: 'Error',
+                        text: 'Failed to delete recipe: ' + error.message,
+                        icon: 'error',
+                        confirmButtonColor: '#ff6b6b'
+                    });
+                });
+        }
+    });
+}
+
+function logout() {
+    Swal.fire({
+        title: 'Logout Confirmation',
+        text: 'Are you sure you want to logout?',
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#ff6b6b',
+        cancelButtonColor: '#808080',
+        confirmButtonText: 'Yes, logout!'
+    }).then((result) => {
+        if (result.isConfirmed) {
+            auth.signOut().then(() => {
+                Swal.fire({
+                    title: 'Logged Out!',
+                    text: 'You have been successfully logged out.',
+                    icon: 'success',
+                    confirmButtonColor: '#ff6b6b'
+                }).then(() => {
+                    window.location.href = 'index.html';
+                });
+            }).catch((error) => {
+                Swal.fire({
+                    title: 'Error',
+                    text: 'Failed to logout: ' + error.message,
+                    icon: 'error',
+                    confirmButtonColor: '#ff6b6b'
+                });
+            });
+        }
+    });
+}
+
+
+
+function filterRecipes() {
+    const searchQuery = document.getElementById('searchBar').value.toLowerCase();
+    const currentRecipes = userRecipes.length === 0 ? allRecipes : userRecipes;
+    const filteredRecipes = currentRecipes.filter(recipe => 
+        recipe.name.toLowerCase().includes(searchQuery)
+    );
+    renderRecipes(filteredRecipes);
+}
+
+
+
+// Fixed exploreRecipe function
+// Fixed exploreRecipe function
+function exploreRecipe(recipeId, isEdit = false) {
+    // Get the recipe from either allRecipes or userRecipes
+    const recipe = [...allRecipes, ...userRecipes].find(r => r.id === recipeId);
+    
+    if (!recipe) {
+        Swal.fire({
+            title: 'Error',
+            text: 'Recipe not found',
+            icon: 'error',
+            confirmButtonColor: '#ff6b6b'
+        });
+        return;
+    }
+
+    if (isEdit) {
+        // Open edit modal instead of view modal
+        openEditModal(recipe);
+        return;
+    }
+    
+    // Get modal elements
+    const recipeModal = document.getElementById('recipeModal');
+    const modalContent = document.getElementById('modalContent');
+    const avgRatingElement = document.getElementById('avgRating');
+    const totalReviewsElement = document.getElementById('totalReviews');
+    const feedbackList = document.getElementById('feedbackList');
+    
+    // Calculate average rating
+    const avgRating = recipe.feedback && recipe.feedback.length > 0
+        ? recipe.feedback.reduce((sum, fb) => sum + fb.rating, 0) / recipe.feedback.length
+        : 0;
+    
+    // Update rating display
+    avgRatingElement.textContent = avgRating.toFixed(1);
+    totalReviewsElement.textContent = recipe.feedback ? recipe.feedback.length : 0;
+    
+    // Store recipe ID for feedback submission
+    modalContent.setAttribute('data-recipe-id', recipe.id);
+    
+    // Populate modal content
+    modalContent.innerHTML = `
+        <div class="recipe-header">
+            <h2 class="recipe-title" data-recipe-id="${recipe.id}">${recipe.name}</h2>
+            <p class="creator">Created by: ${recipe.user?.displayName || 'Anonymous'}</p>
+            <p class="description">${recipe.description || 'No description available'}</p>
+        </div>
+        
+        <div class="recipe-section">
+            <h3>Ingredients</h3>
+            <ul>
+                ${recipe.ingredients ? recipe.ingredients.split(',').map(ing => `
+                    <li>${ing.trim()}</li>
+                `).join('') : '<li>No ingredients listed</li>'}
+            </ul>
+        </div>
+        
+        <div class="recipe-section">
+            <h3>Instructions</h3>
+            <ol>
+                ${recipe.instructions ? recipe.instructions.split('.').filter(inst => inst.trim()).map(inst => `
+                    <li>${inst.trim()}</li>
+                `).join('') : '<li>No instructions available</li>'}
+            </ol>
+        </div>
+        
+        ${recipe.video ? `
+        <div class="recipe-section">
+            <h3>Recipe Video</h3>
+            <div class="video-container">
+                ${recipe.video}
+            </div>
+        </div>
+        ` : ''}
+    `;
+    
+    // Update feedback list
+    feedbackList.innerHTML = recipe.feedback && recipe.feedback.length > 0 
+        ? recipe.feedback.map(fb => `
+            <div class="feedback-item">
+                <h4>${fb.userName || 'Anonymous'}</h4>
+                <p>${fb.text}</p>
+                <div class="rating">Rating: ${'⭐'.repeat(fb.rating)}</div>
+            </div>
+        `).join('')
+        : '<p>No feedback yet</p>';
+    
+    // Reset feedback form
+    if (document.getElementById('feedbackInput')) {
+        document.getElementById('feedbackInput').value = '';
+        currentSelectedRating = 0;
+        document.querySelectorAll('.rating span').forEach(star => star.classList.remove('selected'));
+    }
+    
+    // Show the modal
+    recipeModal.style.display = 'block';
+}
+
+// Helper function to calculate average rating
+function calculateAverageRating(recipe) {
+    if (!recipe.feedback || recipe.feedback.length === 0) return 0;
+    return recipe.feedback.reduce((sum, fb) => sum + fb.rating, 0) / recipe.feedback.length;
+}
+
+// Helper functions for modal interactions
+function closeModal() {
+    document.getElementById('recipeModal').style.display = 'none';
+    document.getElementById('feedbackInput').value = '';
+    currentSelectedRating = 0;
+    document.querySelectorAll('.rating span').forEach(span => 
+        span.classList.remove('text-yellow-400'));
+}
+
+function closeEditModal() {
+    document.getElementById('editModal').style.display = 'none';
+}
+
+
+
+
+// Global variable for tracking rating
+let currentSelectedRating = 0;
+
+// Enhanced rating function
+function rateRecipe(rating) {
+    currentSelectedRating = rating;
+    const stars = document.querySelectorAll('.rating span');
+    stars.forEach((star, index) => {
+        star.style.color = index < rating ? '#FCD34D' : '#D1D5DB';
+    });
+}
+
+// Fixed submitFeedback function
+// Fixed submitFeedback function with proper Firestore timestamp handling
+function submitFeedback() {
+    try {
+        const modalContent = document.getElementById('modalContent');
+        if (!modalContent) {
+            throw new Error('Modal content not found');
+        }
+
+        const recipeId = modalContent.getAttribute('data-recipe-id');
+        if (!recipeId) {
+            throw new Error('Recipe ID not found');
+        }
+
+        const recipe = [...allRecipes, ...userRecipes].find(r => r.id === recipeId);
+        if (!recipe) {
+            throw new Error('Recipe not found');
+        }
+
+        const feedbackInput = document.getElementById('feedbackInput');
+        if (!feedbackInput) {
+            throw new Error('Feedback input not found');
+        }
+
+        const feedbackText = feedbackInput.value.trim();
+
+        // Validation checks
+        if (!feedbackText) {
+            Swal.fire({
+                title: 'Missing Comment',
+                text: 'Please write a review comment.',
+                icon: 'warning',
+                confirmButtonColor: '#ff6b6b'
+            });
+            return;
+        }
+
+        if (currentSelectedRating === 0) {
+            Swal.fire({
+                title: 'Missing Rating',
+                text: 'Please select a rating (1-5 stars).',
+                icon: 'warning',
+                confirmButtonColor: '#ff6b6b'
+            });
+            return;
+        }
+
+        if (!currentUser) {
+            Swal.fire({
+                title: 'Login Required',
+                text: 'Please login to submit a review.',
+                icon: 'info',
+                confirmButtonColor: '#ff6b6b'
+            });
+            return;
+        }
+
+        // Create feedback object without serverTimestamp
+        const newFeedback = {
+            text: feedbackText,
+            rating: currentSelectedRating,
+            userId: currentUser.uid,
+            userName: currentUser.displayName || 'Anonymous',
+            timestamp: new Date().toISOString() // Use ISO string instead of serverTimestamp
+        };
+
+        // Show loading state
+        const submitButton = document.querySelector('[onclick="submitFeedback()"]');
+        if (submitButton) {
+            submitButton.disabled = true;
+            submitButton.textContent = 'Submitting...';
+        }
+
+        // Get the current feedback array
+        db.collection('recipes').doc(recipe.id).get()
+            .then((doc) => {
+                const currentFeedback = doc.data().feedback || [];
+                
+                // Add new feedback to the array
+                const updatedFeedback = [...currentFeedback, newFeedback];
+                
+                // Update the document with the new feedback array
+                return db.collection('recipes').doc(recipe.id).update({
+                    feedback: updatedFeedback
+                });
+            })
+            .then(() => {
+                // Update local data
+                if (!recipe.feedback) {
+                    recipe.feedback = [];
+                }
+                recipe.feedback.push(newFeedback);
+
+                // Reset form
+                feedbackInput.value = '';
+                currentSelectedRating = 0;
+                const stars = document.querySelectorAll('.rating span');
+                stars.forEach(star => star.style.color = '#D1D5DB');
+
+                // Refresh the recipe display
+                exploreRecipe(recipe.id);
+
+                // Show success message
+                Swal.fire({
+                    title: 'Success',
+                    text: 'Thank you for your review!',
+                    icon: 'success',
+                    confirmButtonColor: '#4CAF50'
+                });
+            })
+            .catch((error) => {
+                console.error('Error submitting feedback:', error);
+                Swal.fire({
+                    title: 'Error',
+                    text: 'Failed to submit review. Please try again.',
+                    icon: 'error',
+                    confirmButtonColor: '#ff6b6b'
+                });
+            })
+            .finally(() => {
+                // Reset button state
+                if (submitButton) {
+                    submitButton.disabled = false;
+                    submitButton.textContent = 'Submit Review';
+                }
+            });
+
+    } catch (error) {
+        console.error('Error in submitFeedback:', error);
+        Swal.fire({
+            title: 'Error',
+            text: error.message || 'An error occurred while submitting the review.',
+            icon: 'error',
+            confirmButtonColor: '#ff6b6b'
+        });
+    }
+}
+
+// Firebase Configuration remains the same
+
+let allRecipes = []; // Store all recipes globally
+let userRecipes = []; // Store user-specific recipes
+
+function fetchAllRecipes() {
+    db.collection('recipes')
+        .get()
+        .then((querySnapshot) => {
+            allRecipes = querySnapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            }));
+            renderRecipes(allRecipes);
+        })
+        .catch((error) => {
+            Swal.fire({
+                title: 'Error',
+                text: 'Failed to fetch all recipes: ' + error.message,
+                icon: 'error',
+                confirmButtonColor: '#ff6b6b'
+            });
+        });
+}
+
+
+
+
+
+
+// Add navigation highlighting
+function updateNavHighlight() {
+    const navLinks = document.querySelectorAll('.nav-links a');
+    navLinks.forEach(link => link.classList.remove('active'));
+    event.target.classList.add('active');
+}
+
+
+// Improved switch functions with proper navigation highlighting
+function switchToAllRecipes() {
+    const navLinks = document.querySelectorAll('.nav-links a');
+    navLinks.forEach(link => link.classList.remove('active'));
+    document.querySelector('.nav-links a[onclick="switchToAllRecipes()"]').classList.add('active');
+    renderRecipes(allRecipes);
+}
+
+function switchToUserRecipes() {
+    const navLinks = document.querySelectorAll('.nav-links a');
+    navLinks.forEach(link => link.classList.remove('active'));
+    document.querySelector('.nav-links a[onclick="switchToUserRecipes()"]').classList.add('active');
+    renderRecipes(userRecipes);
+}
+
+
+
+
+
+
+
+    </script>
+</body>
+</html>
