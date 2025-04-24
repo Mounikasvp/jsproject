@@ -1,4 +1,4 @@
-// Import the functions you need from the SDKs you need
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
 import { 
@@ -13,8 +13,6 @@ import {
     deleteDoc, 
     serverTimestamp 
 } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
-
-// Firebase Configuration
 const firebaseConfig = {
     apiKey: "AIzaSyDmYXy4OGpK_BwJ_26f4W4azKDZDICWR3w",
     authDomain: "emaillogin-d9312.firebaseapp.com",
@@ -25,12 +23,12 @@ const firebaseConfig = {
     measurementId: "G-TE5EVPJVM6"
 };
 
-// Initialize Firebase
+
 const app = initializeApp(firebaseConfig);
 const auth = getAuth(app);
 const db = getFirestore(app);
 
-// Check Authentication State
+
 onAuthStateChanged(auth, (user) => {
     if (user) {
         loadUserRecipes(user.uid);
@@ -86,7 +84,7 @@ async function loadUserRecipes(userId) {
             recipesContainer.appendChild(recipeCard);
         });
         
-        // Activate staggered animation after cards are added
+    
         setTimeout(() => {
             const staggeredCards = document.querySelectorAll('.staggered-appear');
             staggeredCards.forEach((card, index) => {
@@ -101,20 +99,6 @@ async function loadUserRecipes(userId) {
         Swal.fire('Error', 'Failed to load recipes: ' + error.message, 'error');
     }
 }
-
-// Make functions accessible globally
-// window.viewRecipe = function(recipeId) {
-//     window.location.href = `recipe-details.html?id=${recipeId}`;
-// };
-// Make functions accessible globally
-// window.viewRecipe = function(recipeId) {
-//     if (!recipeId) {
-//         console.error("Recipe ID is undefined");
-//         return;
-//     }
-//     console.log("Viewing recipe:", recipeId); // Add this for debugging
-//     window.location.href = `recipe-details.html?id=${recipeId}`;
-// };
 window.viewRecipe = function(recipeId) {
     window.location.href = `recipe-detail.html?id=${recipeId}`;
 };
@@ -145,9 +129,8 @@ window.editRecipe = async function(recipeId) {
         Swal.fire('Error', 'Failed to load recipe: ' + error.message, 'error');
     }
 };
-// Add this function to your JavaScript file
+
 function addCategoryDropdownToEditForm() {
-    // Check if the category dropdown already exists to avoid duplication
     if (!document.getElementById('recipeCategory')) {
         // Create the category dropdown
         const categoryDropdown = document.createElement('div');
@@ -170,23 +153,15 @@ function addCategoryDropdownToEditForm() {
              
             </select>
         `;
-        
-        // Find a good place to insert the dropdown in the form
-        // Let's assume there's a submit button or another form field we can reference
         const form = document.getElementById('editRecipeForm');
         const submitButton = form.querySelector('button[type="submit"]');
-        
-        // Insert before the submit button's parent container
         if (submitButton && submitButton.parentElement) {
             form.insertBefore(categoryDropdown, submitButton.parentElement);
         } else {
-            // If we can't find the submit button, just append to the form
             form.appendChild(categoryDropdown);
         }
     }
 }
-
-// Modify your existing editRecipe function
 window.editRecipe = async function(recipeId) {
     try {
         const docRef = doc(db, 'recipes', recipeId);
@@ -201,42 +176,29 @@ window.editRecipe = async function(recipeId) {
             document.getElementById('recipeInstructions').value = recipe.instructions;
             document.getElementById('recipeImage').value = recipe.image;
             document.getElementById('recipeVideo').value = recipe.video;
-            
-            // Show the edit modal first
             showEditModal();
-            
-            // Then add the category dropdown if it doesn't exist
             addCategoryDropdownToEditForm();
-            
-            // Now set the value of the category dropdown
             setTimeout(() => {
                 const categoryDropdown = document.getElementById('recipeCategory');
                 if (categoryDropdown) {
-                    // Check if the recipe's category is in our fixed list
-                    const validCategories = ['beverages', 'biryani', 'pizza', 'burger', 'desserts', 'breakfast', 'pasta', 'others'];
-                    
-                    // If the recipe has a valid category, use it, otherwise default to "Uncategorized"
+                    const validCategories = ['beverages', 'biryani', 'pizza', 'burger', 'dessert', 'breakfast', 'pasta', 'others'];
                     if (recipe.category && validCategories.includes(recipe.category)) {
                         categoryDropdown.value = recipe.category;
                     } else {
                         categoryDropdown.value = 'Uncategorized';
                     }
                 }
-            }, 100); // Short timeout to ensure the dropdown is in the DOM
+            }, 100);
         }
     } catch (error) {
         console.error("Error getting recipe:", error);
         Swal.fire('Error', 'Failed to load recipe: ' + error.message, 'error');
     }
 };
-
-// Make sure the category is included when updating the recipe
 document.getElementById('editRecipeForm').addEventListener('submit', async function(e) {
     e.preventDefault();
     const recipeId = document.getElementById('recipeId').value;
     const user = auth.currentUser;
-
-    // Show loading indicator
     Swal.fire({
         title: 'Saving...',
         allowOutsideClick: false,
@@ -244,8 +206,6 @@ document.getElementById('editRecipeForm').addEventListener('submit', async funct
             Swal.showLoading();
         }
     });
-
-    // Get the category value from the dropdown
     const categoryElement = document.getElementById('recipeCategory');
     const category = categoryElement ? categoryElement.value : 'Uncategorized';
 
@@ -256,7 +216,7 @@ document.getElementById('editRecipeForm').addEventListener('submit', async funct
         instructions: document.getElementById('recipeInstructions').value,
         image: document.getElementById('recipeImage').value || '/api/placeholder/300/200',
         video: document.getElementById('recipeVideo').value || '',
-        category: category, // Using the selected category
+        category: category, 
         user: user ? { email: user.email, uid: user.uid } : {},
         updatedAt: serverTimestamp()
     };
@@ -298,8 +258,6 @@ document.getElementById('editRecipeForm').addEventListener('submit', async funct
     e.preventDefault();
     const recipeId = document.getElementById('recipeId').value;
     const user = auth.currentUser;
-
-    // Show loading indicator
     Swal.fire({
         title: 'Saving...',
         allowOutsideClick: false,
@@ -422,23 +380,17 @@ window.logout = async function() {
     });
 };
 function goBack() {
-    // Always redirect to the home page
     window.location.href = "yum.html";
 }
-
-// Add event listener to the back button once the DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
     const backButton = document.querySelector('.back-btn');
     if (backButton) {
-        // Ensure the button is visible
         backButton.style.display = "inline-block";
         backButton.style.visibility = "visible";
         backButton.style.opacity = "1";
-        // Add background color to make it more noticeable
         backButton.style.backgroundColor = "#ca8a04";
-        
         backButton.addEventListener('click', function(event) {
-            event.preventDefault(); // Prevent default action
+            event.preventDefault(); 
             goBack();
         });
     } else {

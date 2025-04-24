@@ -1,6 +1,3 @@
-// Firebase Configuration
-
-// Initialize Firebase with v9 syntax
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
 import { 
@@ -8,7 +5,6 @@ import {
     doc, 
     getDoc
 } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
-
 const firebaseConfig = {
     apiKey: "AIzaSyDmYXy4OGpK_BwJ_26f4W4azKDZDICWR3w",
     authDomain: "emaillogin-d9312.firebaseapp.com",
@@ -132,8 +128,7 @@ function displayRecipeDetails(recipe) {
     </div>
 </div>
      `;
-    
-    // Add star rating functionality
+
     document.querySelectorAll('.star').forEach(star => {
         star.addEventListener('click', (e) => {
             const rating = parseInt(e.target.dataset.rating);
@@ -157,7 +152,7 @@ function updateStars(rating) {
 function submitFeedback() {
     const feedbackText = document.getElementById('feedbackText').value.trim();
     if (!feedbackText || currentRating === 0) {
-        // Using SweetAlert2 syntax
+       
         Swal.fire({
             title: 'Error!',
             text: 'Please provide both a rating and feedback text.',
@@ -167,11 +162,10 @@ function submitFeedback() {
         return;
     }
 
-    // Get existing feedbacks
     const feedbacks = JSON.parse(localStorage.getItem(`feedbacks_${recipeId}`) || '[]');
     
     if (feedbackBeingEdited !== null) {
-        // Edit existing feedback
+   
         feedbacks[feedbackBeingEdited] = {
             email: currentUserEmail,
             rating: currentRating,
@@ -179,29 +173,22 @@ function submitFeedback() {
             date: new Date().toISOString(),
             editedAt: new Date().toISOString()
         };
-        
-        // Show success message
         Swal.fire({
             title: 'Success!',
             text: 'Your feedback has been updated.',
             icon: 'success',
             confirmButtonText: 'Great!'
         });
-        
-        // Reset edit mode
         feedbackBeingEdited = null;
         document.getElementById('submitFeedbackBtn').textContent = 'Submit Feedback';
         document.getElementById('cancelEditBtn').classList.add('hidden');
     } else {
-        // Add new feedback
         feedbacks.push({
             email: currentUserEmail,
             rating: currentRating,
             text: feedbackText,
             date: new Date().toISOString()
         });
-        
-        // Show success message
         Swal.fire({
             title: 'Success!',
             text: 'Your feedback has been submitted.',
@@ -209,34 +196,22 @@ function submitFeedback() {
             confirmButtonText: 'Great!'
         });
     }
-    
-    // Save updated feedbacks
     localStorage.setItem(`feedbacks_${recipeId}`, JSON.stringify(feedbacks));
-
-    // Reset form
     document.getElementById('feedbackText').value = '';
     currentRating = 0;
     updateStars(0);
-
-    // Reload feedbacks
     loadFeedbacks();
 }
 
 function editFeedback(index) {
     const feedbacks = JSON.parse(localStorage.getItem(`feedbacks_${recipeId}`) || '[]');
     const feedback = feedbacks[index];
-    
-    // Set form values
     document.getElementById('feedbackText').value = feedback.text;
     currentRating = feedback.rating;
     updateStars(currentRating);
-    
-    // Switch to edit mode
     feedbackBeingEdited = index;
     document.getElementById('submitFeedbackBtn').textContent = 'Update Feedback';
     document.getElementById('cancelEditBtn').classList.remove('hidden');
-    
-    // Scroll to form
     document.getElementById('feedbackForm').scrollIntoView({ behavior: 'smooth' });
 }
 
@@ -251,31 +226,19 @@ function deleteFeedback(index) {
         confirmButtonText: 'Yes, delete it!'
     }).then((result) => {
         if (result.isConfirmed) {
-            // Get feedbacks
             const feedbacks = JSON.parse(localStorage.getItem(`feedbacks_${recipeId}`) || '[]');
-            
-            // Remove feedback at index
             feedbacks.splice(index, 1);
-            
-            // Save updated feedbacks
             localStorage.setItem(`feedbacks_${recipeId}`, JSON.stringify(feedbacks));
-            
-            // If deleting the one being edited, reset edit mode
             if (feedbackBeingEdited === index) {
                 cancelEdit();
             } else if (feedbackBeingEdited !== null && feedbackBeingEdited > index) {
-                // Adjust index if deleting feedback before the one being edited
                 feedbackBeingEdited--;
             }
-            
-            // Show success message
             Swal.fire(
                 'Deleted!',
                 'Your feedback has been deleted.',
                 'success'
             );
-            
-            // Reload feedbacks
             loadFeedbacks();
         }
     });
@@ -364,7 +327,6 @@ function logout() {
     });
 }
 
-// Auth state observer
 onAuthStateChanged(auth, (user) => {
     if (!user) {
         window.location.href = 'index.html';
@@ -374,7 +336,6 @@ onAuthStateChanged(auth, (user) => {
     }
 });
 
-// Make functions globally accessible
 window.submitFeedback = submitFeedback;
 window.editFeedback = editFeedback;
 window.deleteFeedback = deleteFeedback;

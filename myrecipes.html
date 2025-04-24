@@ -4,13 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Recipes</title>
-    <!-- Tailwind CSS -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
-    <!-- Bootstrap CSS for additional animations -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.1.3/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Animate.css for more animation options -->
     <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
-    <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital@0;1&display=swap');
@@ -24,10 +20,6 @@
             font-family: 'Playfair Display', serif;
             font-style: italic;
         }
-        
-     
-        
-        /* Enhanced fade-in animation */
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
@@ -36,8 +28,6 @@
         .animate-fade-in {
             animation: fadeIn 0.5s ease-out;
         }
-        
-        /* Enhanced hover effect for cards */
         .recipe-card {
             backface-visibility: hidden;
             transform: translateZ(0);
@@ -56,8 +46,6 @@
             transform: translateY(-2px) scale(0.98);
             transition: transform 0.1s;
         }
-        
-        /* Image hover effect */
         .recipe-image-container {
             overflow: hidden;
             border-radius: 0.5rem;
@@ -70,8 +58,6 @@
         .recipe-card:hover .recipe-image {
             transform: scale(1.08);
         }
-        
-        /* Button animations */
         .btn-action {
             transition: all 0.3s ease;
             position: relative;
@@ -92,8 +78,6 @@
         .btn-action:hover:before {
             left: 100%;
         }
-        
-        /* Modal animation */
         @keyframes slideIn {
             from { opacity: 0; transform: translateY(-20px); }
             to { opacity: 1; transform: translateY(0); }
@@ -102,8 +86,6 @@
         .modal-animation {
             animation: slideIn 0.3s ease-out;
         }
-        
-        /* Card appearance animation */
         @keyframes cardAppear {
             0% { opacity: 0; transform: scale(0.9) translateY(20px); }
             100% { opacity: 1; transform: scale(1) translateY(0); }
@@ -112,13 +94,9 @@
         .card-appear {
             animation: cardAppear 0.5s forwards;
         }
-        
-        /* Staggered animation for cards */
         .staggered-appear {
             opacity: 0;
         }
-        
-        /* Recipe badges */
         .recipe-badge {
             display: inline-block;
             padding: 0.25rem 0.75rem;
@@ -136,7 +114,6 @@
         
     
         
-        /* Floating animation for featured recipes */
         @keyframes float {
             0% { transform: translateY(0); }
             50% { transform: translateY(-5px); }
@@ -147,7 +124,7 @@
             animation: float 3s ease-in-out infinite;
         }
         
-        /* Custom scrollbar */
+
         ::-webkit-scrollbar {
             width: 8px;
         }
@@ -165,7 +142,7 @@
             background: #693d52;
         }
         .custom-scrollbar {
-          overflow-y: scroll !important; /* Force scrollbar to always be visible */
+          overflow-y: scroll !important; 
         }
         
         .custom-scrollbar::-webkit-scrollbar {
@@ -188,7 +165,7 @@
           background: #e67e22;
         }
         
-        /* Orange Hover Effect for Input Fields */
+   
         .input-hover-effect:hover {
           background-color: rgba(255, 140, 66, 0.05);
           border-color: #ff8c42;
@@ -197,15 +174,15 @@
         .navbar-brand {
                 font-family: serif;
                 font-weight: bold;
-                color:  #f5b938!important; /* Bootstrap equivalent of yellow-600 */
+                color:  #f5b938!important; 
                 font-size: 1.5rem;
             }
             .nav-link {
-                color: #1f2937 !important; /* Bootstrap equivalent of gray-800 */
+                color: #1f2937 !important; 
                 transition: color 0.15s ease-in-out;
             }
             .nav-link:hover {
-                color: #f5b938 !important; /* Bootstrap equivalent of yellow-600 */
+                color: #f5b938 !important; 
             }
             
   </style>      
@@ -213,15 +190,10 @@
 <body class="bg-gray-50">
     <nav class="navbar navbar-expand-md navbar-light bg-white fixed-top shadow-sm py-4">
         <div class="container">
-            <!-- Logo and Brand -->
             <a class="navbar-brand" href="#">YUM LIBRARY</a>
-            
-            <!-- Mobile menu button -->
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            
-            <!-- Navigation Links -->
             <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
                 <ul class="navbar-nav">
                     <li class="nav-item">
@@ -251,11 +223,6 @@
             ← Back to Home
         </button>
     </div>
-
-
-
-    
-    <!-- Main Content -->
     <div class="container mx-auto px-4 py-12 ">
         <h2 class="text-2xl text-center font-bold mb-8 animate__animated animate__fadeIn cursive-text text-gray-800">My Recipes</h2>
         <div id="recipesContainer" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
