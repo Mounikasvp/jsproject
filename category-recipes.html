@@ -9,15 +9,15 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital@0;1&display=swap');
-        
+
         .cursive-text {
             font-family: 'Playfair Display', serif;
             font-style: italic;
         }
-        
-    
-        
-      
+
+
+
+
         /* Ensure consistent image size for all recipe cards */
         .recipe-card img {
     width: 100%; /* Ensure the image takes up the full width of the card */
@@ -41,11 +41,11 @@
 
 /* Staggered appearance animation for cards */
 @keyframes cardAppear {
-    0% { 
+    0% {
         opacity: 0;
         transform: scale(0.9) translateY(30px);
     }
-    100% { 
+    100% {
         opacity: 1;
         transform: scale(1) translateY(0);
     }
@@ -81,7 +81,7 @@
 .recipe-card.featured {
     animation: pulseShadow 3s infinite ease-in-out;
     border: 2px solid transparent;
-    background-image: linear-gradient(white, white), 
+    background-image: linear-gradient(white, white),
                      linear-gradient(135deg, #fc9f36, #e08b2a);
     background-origin: border-box;
     background-clip: content-box, border-box;
@@ -190,26 +190,66 @@
             .nav-link:hover {
                 color: #ca8a04 !important; /* Bootstrap equivalent of yellow-600 */
             }
+
+            /* No loader CSS needed - using inline styles */
+
+            /* Shimmer effect for recipe cards */
+            .shimmer-card {
+                background: #f6f7f8;
+                background-image: linear-gradient(
+                    to right,
+                    #f6f7f8 0%,
+                    #edeef1 20%,
+                    #f6f7f8 40%,
+                    #f6f7f8 100%
+                );
+                background-repeat: no-repeat;
+                background-size: 800px 100%;
+                animation: shimmer 1.5s infinite linear;
+            }
+
+            @keyframes shimmer {
+                0% {
+                    background-position: -468px 0;
+                }
+                100% {
+                    background-position: 468px 0;
+                }
+            }
+
+            /* Pulse animation for loading text */
+            @keyframes pulse-text {
+                0%, 100% {
+                    opacity: 1;
+                }
+                50% {
+                    opacity: 0.5;
+                }
+            }
+
+            .animate-pulse {
+                animation: pulse-text 1.5s infinite;
+            }
         </style>
-   
+
     <body>
         <nav class="navbar navbar-expand-md navbar-light bg-white fixed-top shadow-sm py-4">
             <div class="container">
                 <!-- Logo and Brand -->
                 <a class="navbar-brand" href="#">YUM LIBRARY</a>
-                
+
                 <!-- Mobile menu button -->
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
                     <span class="navbar-toggler-icon"></span>
                 </button>
-                
+
                 <!-- Navigation Links -->
                 <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
                     <ul class="navbar-nav">
                         <li class="nav-item">
                             <a class="nav-link fw-medium px-3" href="yum.html">HOME</a>
                         </li>
-                       
+
                         <li class="nav-item">
                             <a class="nav-link fw-medium px-3" href="myrecipes.html">MY RECIPES</a>
                         </li>
@@ -227,11 +267,11 @@
         </nav>
       <!-- Reduced spacing for back button container -->
 <div class="container mx-auto px-4 pt-16 pb-0 mt-12">
-    <button 
-        onclick="goBack()" 
-        class="back-btn btn text-white px-6 py-2 rounded-full font-medium" 
-        style="background-color: #fc9f36; border-radius: 20px; transition: all 0.3s ease;" 
-        onmouseover="this.style.backgroundColor='#e08b2a'; this.style.transform='translateY(-3px)'; this.style.boxShadow='0 4px 8px rgba(0,0,0,0.2)';" 
+    <button
+        onclick="goBack()"
+        class="back-btn btn text-white px-6 py-2 rounded-full font-medium"
+        style="background-color: #fc9f36; border-radius: 20px; transition: all 0.3s ease;"
+        onmouseover="this.style.backgroundColor='#e08b2a'; this.style.transform='translateY(-3px)'; this.style.boxShadow='0 4px 8px rgba(0,0,0,0.2)';"
         onmouseout="this.style.backgroundColor='#fc9f36'; this.style.transform='translateY(0)'; this.style.boxShadow='none';"
     >
         ← Back to Home
@@ -262,9 +302,14 @@
     </h2>
 </div>
 
+<!-- Absolutely Plain Text Loader -->
+<div id="loader" style="display: flex; justify-content: center; align-items: center; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(255, 255, 255, 0.9); z-index: 9999;">
+    <p style="font-size: 18px; color: #693d52; font-weight: 500;">Loading recipes...</p>
+</div>
+
 <!-- Recipe Grid with reduced top padding -->
 <div class="container mx-auto px-4 pb-12 pt-2">
-    <div id="recipeGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+    <div id="recipeGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" style="display: none !important;">
         <!-- Recipe cards will be dynamically inserted here -->
     </div>
 </div>

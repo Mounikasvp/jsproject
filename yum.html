@@ -7,8 +7,9 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.19/tailwind.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
     <link href="styles.css" rel="stylesheet">
-   
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 </head>
 <body class="bg-white">
     <nav class="bg-white shadow-md fixed w-full z-50 py-4 animate__animated animate__slideInDown">
@@ -20,7 +21,7 @@
                     </div>
                 </div>
             <div class="hidden md:flex items-center space-x-8">
-                    <a href="#"
+                    <a href="#home"
                         class="text-gray-800 hover:text-yellow-600 px-3 py-2 font-medium transition duration-150 ease-in-out hover-grow">HOME</a>
                     <a href="#about"
                         class="text-gray-800 hover:text-yellow-600 px-3 py-2 font-medium transition duration-150 ease-in-out hover-grow">ABOUT</a>
@@ -30,6 +31,8 @@
                     <a href="favorites.html"
                         class="text-gray-800 hover:text-yellow-600 px-3 py-2 font-medium transition duration-150 ease-in-out hover-grow">MY
                         FAV ❤️</a>
+                    <button id="signout-btn"
+                        class="text-gray-800 hover:text-yellow-600 px-3 py-2 font-medium transition duration-150 ease-in-out hover-grow">LOGOUT</button>
                 </div>
                 <div class="flex md:hidden items-center">
                     <button id="mobile-menu-button" type="button"
@@ -52,7 +55,7 @@
         </div>
         <div id="mobile-menu" class="md:hidden bg-white border-t border-gray-200 animate__animated animate__fadeIn">
             <div class="px-2 pt-2 pb-3 space-y-1 sm:px-3">
-                <a href="#"
+                <a href="#home"
                     class="block px-3 py-2 text-gray-800 font-medium hover:bg-yellow-50 hover:text-yellow-600 rounded-md hover-grow">HOME</a>
                 <a href="#about"
                     class="block px-3 py-2 text-gray-800 font-medium hover:bg-yellow-50 hover:text-yellow-600 rounded-md hover-grow">ABOUT</a>
@@ -62,11 +65,13 @@
                 <a href="favorites.html"
                     class="block px-3 py-2 text-gray-800 font-medium hover:bg-yellow-50 hover:text-yellow-600 rounded-md hover-grow">MY
                     FAV ❤️</a>
+                <button id="mobile-signout-btn"
+                    class="block w-full text-left px-3 py-2 text-gray-800 font-medium hover:bg-yellow-50 hover:text-yellow-600 rounded-md hover-grow mt-2">LOGOUT</button>
             </div>
         </div>
     </nav>
     <div class="h-16"></div>
-    <div class="text-center py-12 recipe mt-16 animate__animated animate__fadeIn">
+    <div id="home" class="text-center py-12 recipe mt-16 animate__animated animate__fadeIn">
         <h2 class="text-xl">
             SIMPLE RECIPES MADE FOR
             <span class="cursive-text text-[#693d52] hover-grow" style="color:#693d52;">real, actual, everyday

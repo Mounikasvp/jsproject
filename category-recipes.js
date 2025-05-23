@@ -24,28 +24,80 @@ const urlParams = new URLSearchParams(window.location.search);
 const category = urlParams.get('category');
 
 // Update category title
-document.getElementById('categoryTitle').textContent = 
+document.getElementById('categoryTitle').textContent =
     category ? category.charAt(0).toUpperCase() + category.slice(1) + ' Recipes' : 'All Recipes';
 
 let allRecipes = [];
 
+// Function to create shimmer loading cards - disabled
+function createShimmerCards() {
+    console.log('Shimmer cards disabled - using simple text loader');
+    return;
+}
+
 // Fetch recipes from Firestore
 async function fetchRecipes() {
     try {
+        console.log('Fetching recipes from Firestore...');
+
+        // Show loader and hide recipe grid
+        const loader = document.getElementById('loader');
+        const recipeGrid = document.getElementById('recipeGrid');
+
+        if (loader) {
+            loader.style.display = 'flex';
+            console.log('Loader displayed');
+        } else {
+            console.error('Loader element not found!');
+        }
+
+        if (recipeGrid) {
+            recipeGrid.style.display = 'none';
+            console.log('Recipe grid hidden');
+        }
+
+        // Fetch data from Firestore
         const recipesRef = collection(db, 'recipes');
         let recipeQuery;
-        
+
         if (category) {
             recipeQuery = query(recipesRef, where('category', '==', category));
+            console.log('Fetching recipes for category:', category);
         } else {
             recipeQuery = recipesRef;
+            console.log('Fetching all recipes');
         }
-        
+
         const querySnapshot = await getDocs(recipeQuery);
+        console.log('Fetched', querySnapshot.size, 'recipes');
+
         allRecipes = querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+
+        // Hide loader and show recipe grid
+        if (loader) {
+            loader.style.display = 'none';
+            console.log('Loader hidden');
+        }
+
+        if (recipeGrid) {
+            recipeGrid.style.display = 'grid';
+            console.log('Recipe grid displayed');
+        }
+
+        // Display recipes
         displayRecipes(allRecipes);
     } catch (error) {
         console.error("Error fetching recipes: ", error);
+
+        // Hide loader and show error message
+        const loader = document.getElementById('loader');
+        const recipeGrid = document.getElementById('recipeGrid');
+
+        if (loader) loader.style.display = 'none';
+        if (recipeGrid) {
+            recipeGrid.style.display = 'grid';
+            recipeGrid.innerHTML = '<div class="col-span-full text-center py-8"><p class="text-red-500">Error loading recipes. Please try again later.</p></div>';
+        }
     }
 }
 
@@ -63,26 +115,26 @@ function displayRecipes(recipes) {
 function createRecipeCard(recipe) {
     const favorites = JSON.parse(localStorage.getItem('favoriteRecipes') || '[]');
     const isFavorite = favorites.some(fav => fav.id === recipe.id);
-    
+
     const card = document.createElement('div');
     card.className = 'recipe-card bg-white rounded-lg shadow-lg overflow-hidden';
-    
+
     // Properly stringify the recipe object and escape quotes
     const recipeJSON = JSON.stringify(recipe).replace(/"/g, '&quot;');
-    
+
     card.innerHTML = `
         <img src="${recipe.image}" alt="${recipe.name}" class="w-full h-64 object-cover"/>
         <div class="p-6">
             <div class="flex justify-between items-start mb-2">
                 <h3 class="text-xl font-bold">${recipe.name}</h3>
                 <button onclick="toggleFavorite(event, '${recipeJSON}')" class="focus:outline-none">
-                    <svg class="w-6 h-6 ${isFavorite ? 'text-red-500' : 'text-gray-400'}" 
-                         fill="${isFavorite ? 'currentColor' : 'none'}" 
-                         stroke="currentColor" 
+                    <svg class="w-6 h-6 ${isFavorite ? 'text-red-500' : 'text-gray-400'}"
+                         fill="${isFavorite ? 'currentColor' : 'none'}"
+                         stroke="currentColor"
                          viewBox="0 0 24 24">
-                        <path stroke-linecap="round" 
-                              stroke-linejoin="round" 
-                              stroke-width="2" 
+                        <path stroke-linecap="round"
+                              stroke-linejoin="round"
+                              stroke-width="2"
                               d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                     </svg>
                 </button>
@@ -103,13 +155,13 @@ window.toggleFavorite = function(event, recipeJSON) {
         const recipe = JSON.parse(recipeJSON);
         let favorites = JSON.parse(localStorage.getItem('favoriteRecipes') || '[]');
         const existingIndex = favorites.findIndex(fav => fav.id === recipe.id);
-        
+
         if (existingIndex >= 0) {
             favorites.splice(existingIndex, 1);
         } else {
             favorites.push(recipe);
         }
-        
+
         localStorage.setItem('favoriteRecipes', JSON.stringify(favorites));
         displayRecipes(allRecipes); // Refresh the display to update heart icons
     } catch (error) {
@@ -120,7 +172,7 @@ window.toggleFavorite = function(event, recipeJSON) {
 // // Search recipes by name
 // window.searchRecipes = function() {
 //     const query = document.getElementById('searchInput').value.toLowerCase();
-//     const filteredRecipes = allRecipes.filter(recipe => 
+//     const filteredRecipes = allRecipes.filter(recipe =>
 //         recipe.name.toLowerCase().includes(query)
 //     );
 //     displayRecipes(filteredRecipes);
@@ -128,7 +180,7 @@ window.toggleFavorite = function(event, recipeJSON) {
 // Function to handle search
 window.searchRecipes = function() {
     const query = document.getElementById('searchInput').value.toLowerCase();
-    const filteredRecipes = allRecipes.filter(recipe => 
+    const filteredRecipes = allRecipes.filter(recipe =>
         recipe.name.toLowerCase().includes(query)
     );
     displayRecipes(filteredRecipes);
@@ -199,6 +251,25 @@ function goBack() {
 
 // Add event listener to the back button once the DOM is loaded
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM content loaded');
+
+    // Initialize loader
+    const loader = document.getElementById('loader');
+    const recipeGrid = document.getElementById('recipeGrid');
+
+    if (loader) {
+        loader.style.display = 'flex';
+        console.log('Loader initialized on page load');
+    } else {
+        console.error('Loader element not found on page load');
+    }
+
+    if (recipeGrid) {
+        recipeGrid.style.display = 'none';
+        console.log('Recipe grid hidden on page load');
+    }
+
+    // Setup back button
     const backButton = document.querySelector('.back-btn');
     if (backButton) {
         // Ensure the button is visible
@@ -207,7 +278,7 @@ document.addEventListener('DOMContentLoaded', function() {
         backButton.style.opacity = "1";
         // Add background color to make it more noticeable
         backButton.style.backgroundColor = "#ca8a04";
-        
+
         backButton.addEventListener('click', function(event) {
             event.preventDefault(); // Prevent default action
             goBack();

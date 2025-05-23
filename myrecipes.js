@@ -1,17 +1,17 @@
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-app.js";
 import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-auth.js";
-import { 
-    getFirestore, 
-    collection, 
-    query, 
-    where, 
-    getDocs, 
-    doc, 
-    getDoc, 
-    updateDoc, 
-    deleteDoc, 
-    serverTimestamp 
+import {
+    getFirestore,
+    collection,
+    query,
+    where,
+    getDocs,
+    doc,
+    getDoc,
+    updateDoc,
+    deleteDoc,
+    serverTimestamp
 } from "https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore.js";
 const firebaseConfig = {
     apiKey: "AIzaSyDmYXy4OGpK_BwJ_26f4W4azKDZDICWR3w",
@@ -31,38 +31,91 @@ const db = getFirestore(app);
 
 onAuthStateChanged(auth, (user) => {
     if (user) {
+        console.log('User authenticated, showing loader...');
+
+        // Show loader
+        const loader = document.getElementById('loader');
+        const recipesContainer = document.getElementById('recipesContainer');
+
+        if (loader) {
+            loader.style.display = 'flex';
+            console.log('Loader display set to flex');
+        } else {
+            console.error('Loader element not found in onAuthStateChanged!');
+        }
+
+        if (recipesContainer) {
+            recipesContainer.classList.add('hidden');
+            console.log('Recipe container hidden');
+        }
+
+        // Load recipes immediately
         loadUserRecipes(user.uid);
     } else {
+        console.log('User not authenticated, redirecting to login');
         window.location.href = 'index.html';
     }
 });
 
 async function loadUserRecipes(userId) {
     try {
+        console.log('Loading user recipes for user ID:', userId);
+
+        // Get references to loader and container
+        const loader = document.getElementById('loader');
+        const recipesContainer = document.getElementById("recipesContainer");
+
+        console.log('Loader element found:', !!loader);
+        console.log('Recipes container found:', !!recipesContainer);
+
+        // Fetch data from Firebase
+        console.log('Fetching data from Firebase...');
         const recipesRef = collection(db, 'recipes');
         const q = query(recipesRef, where("user.uid", "==", userId));
         const querySnapshot = await getDocs(q);
-        
-        const recipesContainer = document.getElementById("recipesContainer");
-        recipesContainer.innerHTML = "";
-        
+        console.log('Data fetched. Number of recipes:', querySnapshot.size);
+
+        // Clear container
+        if (recipesContainer) {
+            recipesContainer.innerHTML = "";
+            console.log('Recipes container cleared');
+        }
+
+        // Hide loader and show container
+        if (loader) {
+            loader.style.display = 'none';
+            loader.style.visibility = 'hidden';
+            loader.style.opacity = '0';
+            console.log('Loader hidden with multiple style properties');
+        } else {
+            console.error('Loader element not found when trying to hide it!');
+        }
+
+        if (recipesContainer) {
+            recipesContainer.classList.remove('hidden');
+            recipesContainer.style.display = 'grid';
+            console.log('Recipes container shown with explicit display:grid');
+        }
+
+        // Handle empty state
         if (querySnapshot.empty) {
+            console.log('No recipes found');
             recipesContainer.innerHTML = "<p class='text-center text-gray-600 py-8 animate__animated animate__fadeIn'>No recipes found. Create one to get started!</p>";
             return;
         }
-        
+
         querySnapshot.forEach((doc, index) => {
             const recipe = doc.data();
-            const avgRating = recipe.feedback ? 
+            const avgRating = recipe.feedback ?
                 (recipe.feedback.reduce((acc, curr) => acc + curr.rating, 0) / recipe.feedback.length).toFixed(1) : '0.0';
 
             const recipeCard = document.createElement("div");
             recipeCard.classList.add(
-                "recipe-card", "bg-white", "rounded-lg", "shadow-md", 
+                "recipe-card", "bg-white", "rounded-lg", "shadow-md",
                 "staggered-appear", "overflow-hidden"
             );
             recipeCard.style.setProperty('--card-index', index);
-            
+
             recipeCard.innerHTML = `
                 <div class="recipe-image-container">
                     <img src="${recipe.image || 'placeholder.jpg'}" alt="${recipe.name}" class="w-full h-48 object-cover recipe-image"/>
@@ -72,7 +125,7 @@ async function loadUserRecipes(userId) {
                     <p class="text-gray-600 text-sm mb-3 line-clamp-2">${recipe.description.length > 100 ? recipe.description.substring(0, 100) + "..." : recipe.description}</p>
                     <div class="flex flex-wrap mb-3">
                         <span class="recipe-badge bg-yellow-100 text-yellow-800">${recipe.category || 'Uncategorized'}</span>
-                       
+
                     </div>
                     <div class="flex justify-between pt-2">
                     <button onclick="console.log('Button clicked'); if(typeof viewRecipe === 'function') { viewRecipe('${doc.id}'); } else { console.error('viewRecipe function not found'); }" class="btn-action bg-yellow-500 hover:bg-gray-600 text-white px-3 py-1 rounded-full text-sm transition-all duration-300 transform hover:scale-105">View</button>
@@ -83,8 +136,8 @@ async function loadUserRecipes(userId) {
             `;
             recipesContainer.appendChild(recipeCard);
         });
-        
-    
+
+
         setTimeout(() => {
             const staggeredCards = document.querySelectorAll('.staggered-appear');
             staggeredCards.forEach((card, index) => {
@@ -93,7 +146,7 @@ async function loadUserRecipes(userId) {
                 }, 100 * index);
             });
         }, 300);
-        
+
     } catch (error) {
         console.error("Error fetching recipes:", error);
         Swal.fire('Error', 'Failed to load recipes: ' + error.message, 'error');
@@ -107,7 +160,7 @@ window.editRecipe = async function(recipeId) {
     try {
         const docRef = doc(db, 'recipes', recipeId);
         const docSnap = await getDoc(docRef);
-        
+
         if (docSnap.exists()) {
             const recipe = docSnap.data();
             document.getElementById('recipeId').value = recipeId;
@@ -117,7 +170,7 @@ window.editRecipe = async function(recipeId) {
             document.getElementById('recipeInstructions').value = recipe.instructions;
             document.getElementById('recipeImage').value = recipe.image;
             document.getElementById('recipeVideo').value = recipe.video;
-            
+
             if (document.getElementById('recipeCategory')) {
                 document.getElementById('recipeCategory').value = recipe.category || 'Uncategorized';
             }
@@ -138,7 +191,7 @@ function addCategoryDropdownToEditForm() {
         categoryDropdown.innerHTML = `
             <label for="recipeCategory" class="block text-gray-700 font-semibold mb-2">Category</label>
             <select id="recipeCategory" class="w-full px-4 py-2 rounded-lg border border-gray-300 focus:border-orange-500 focus:ring focus:ring-orange-200 transition-all">
-           
+
                     <select id="recipeCategory" required
                             class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-transparent transition-all">
                         <option value="" disabled selected>Select Category</option>
@@ -150,7 +203,7 @@ function addCategoryDropdownToEditForm() {
                         <option value="breakfast">Breakfast</option>
                         <option value="pasta">Pasta</option>
                         <option value="others">Others</option>
-             
+
             </select>
         `;
         const form = document.getElementById('editRecipeForm');
@@ -166,7 +219,7 @@ window.editRecipe = async function(recipeId) {
     try {
         const docRef = doc(db, 'recipes', recipeId);
         const docSnap = await getDoc(docRef);
-        
+
         if (docSnap.exists()) {
             const recipe = docSnap.data();
             document.getElementById('recipeId').value = recipeId;
@@ -216,7 +269,7 @@ document.getElementById('editRecipeForm').addEventListener('submit', async funct
         instructions: document.getElementById('recipeInstructions').value,
         image: document.getElementById('recipeImage').value || '/api/placeholder/300/200',
         video: document.getElementById('recipeVideo').value || '',
-        category: category, 
+        category: category,
         user: user ? { email: user.email, uid: user.uid } : {},
         updatedAt: serverTimestamp()
     };
@@ -382,7 +435,30 @@ window.logout = async function() {
 function goBack() {
     window.location.href = "yum.html";
 }
+
+// Function to create shimmer loading cards - disabled
+function createShimmerCards() {
+    console.log('Shimmer cards disabled - using simple text loader');
+    return;
+}
 document.addEventListener('DOMContentLoaded', function() {
+    // Initialize loader
+    const loader = document.getElementById('loader');
+    const recipesContainer = document.getElementById('recipesContainer');
+
+    // Make sure loader is visible and recipes are hidden initially
+    if (loader) {
+        loader.style.display = 'flex';
+        console.log('Loader should be visible now');
+    } else {
+        console.error('Loader element not found!');
+    }
+
+    if (recipesContainer) {
+        recipesContainer.classList.add('hidden');
+    }
+
+    // Setup back button
     const backButton = document.querySelector('.back-btn');
     if (backButton) {
         backButton.style.display = "inline-block";
@@ -390,7 +466,7 @@ document.addEventListener('DOMContentLoaded', function() {
         backButton.style.opacity = "1";
         backButton.style.backgroundColor = "#ca8a04";
         backButton.addEventListener('click', function(event) {
-            event.preventDefault(); 
+            event.preventDefault();
             goBack();
         });
     } else {

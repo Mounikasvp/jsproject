@@ -5,26 +5,67 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Culinary Canvas</title>
     <link rel="stylesheet" href="index.css">
+    <link rel="stylesheet" href="login.css">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+    <style>
+        /* Direct styles for 375px screens */
+        @media only screen and (width: 375px) {
+            .auth-container {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                min-height: 100vh;
+                padding: 0;
+            }
+
+            .auth-form {
+                max-width: 280px;
+                padding: 20px;
+                border-radius: 10px;
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            }
+
+            .auth-form h2 {
+                margin-bottom: 25px;
+                text-align: center;
+            }
+
+            .input-group {
+                margin-bottom: 20px;
+            }
+
+            .cta-button {
+                margin-top: 40px !important;
+                height: 40px;
+            }
+
+            .auth-form p {
+                margin-top: 40px;
+            }
+        }
+    </style>
 </head>
 
 <body>
-    <div class="auth-container">
-        <form class="auth-form" id="loginForm">
+    <div class="auth-container" style="display: flex; align-items: center; justify-content: center; min-height: 100vh;">
+        <a href="index.html" class="back-link">← Back to Home</a>
+        <form class="auth-form" id="loginForm" style="max-width: 280px; margin: 0 auto;">
             <h2>Login</h2>
             <div class="input-group">
                 <label for="loginEmail"><b>Email</b></label>
-                <input type="email" id="loginEmail" required>
+                <input type="email" id="loginEmail" placeholder="Enter your email" required>
             </div>
             <div class="input-group">
                 <label for="loginPassword"><b>Password</b></label>
-                <input type="password" id="loginPassword" required>
+                <input type="password" id="loginPassword" placeholder="Enter your password" required>
             </div>
-            <button type="submit" class="cta-button">Login</button>
-            <p><b>Don't have an account?<b> <a href="signup.html">Sign Up</a></p>
+            <div style="margin-top: 40px;">
+                <button type="submit" class="cta-button" style="width: 100%; height: 40px;">Login</button>
+            </div>
+            <p style="margin-top: 40px; text-align: center;">Don't have an account? <a href="signup.html">Sign Up</a></p>
         </form>
     </div>
 

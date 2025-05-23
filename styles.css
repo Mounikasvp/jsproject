@@ -4,8 +4,13 @@
     box-sizing: border-box;
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
+html {
+    scroll-behavior: smooth;
+    scroll-padding-top: 80px; /* Adjust based on your navbar height */
+}
 body {
     background-color: #f5f5f5;
+    position: relative;
 }
 @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital@0;1&display=swap');
 
@@ -19,23 +24,37 @@ body {
 .navbar-brand {
     font-family: serif;
     font-weight: bold;
-    color: #ca8a04 !important; 
+    color: #ca8a04 !important;
     font-size: 1.5rem;
 }
 .nav-link {
-    color: #1f2937 !important; 
+    color: #1f2937 !important;
     transition: color 0.15s ease-in-out;
 }
 .nav-link:hover {
-    color: #ca8a04 !important; 
+    color: #ca8a04 !important;
 }
 
 .carousel-container {
     position: relative;
-    margin-top: 80px; 
+    margin-top: 80px;
     padding: 20px 0;
 }
 
+/* Responsive carousel container */
+@media (max-width: 576px) {
+    .carousel-container {
+        margin-top: 60px;
+        padding: 10px 0;
+    }
+}
+
+@media (min-width: 577px) and (max-width: 767px) {
+    .carousel-container {
+        margin-top: 70px;
+        padding: 15px 0;
+    }
+}
 
 .carousel {
     display: flex;
@@ -43,8 +62,15 @@ body {
     scroll-behavior: smooth;
     scroll-snap-type: x mandatory;
     padding: 20px 0;
-    -ms-overflow-style: none;  
-    scrollbar-width: none;  
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+/* Responsive carousel padding */
+@media (max-width: 576px) {
+    .carousel {
+        padding: 10px 0;
+    }
 }
 
 .carousel::-webkit-scrollbar {
@@ -59,6 +85,35 @@ body {
 
 .carousel-item:hover {
     transform: translateY(-5px);
+}
+
+/* Responsive carousel items */
+@media (max-width: 576px) {
+    .carousel-item img {
+        height: 200px !important;
+    }
+
+    .carousel-item .absolute.bottom-4.left-4 span {
+        font-size: 0.8rem;
+        padding: 4px 10px;
+    }
+}
+
+@media (min-width: 577px) and (max-width: 767px) {
+    .carousel-item img {
+        height: 220px !important;
+    }
+
+    .carousel-item .absolute.bottom-4.left-4 span {
+        font-size: 0.9rem;
+        padding: 5px 12px;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 991px) {
+    .carousel-item img {
+        height: 250px !important;
+    }
 }
 
 
@@ -100,6 +155,18 @@ header {
     position: sticky;
     top: 0;
     z-index: 100;
+}
+
+/* Home section spacing */
+#home {
+    padding-top: 100px;
+    margin-top: -20px;
+    scroll-margin-top: 80px;
+}
+
+/* Ensure proper spacing for all sections */
+section {
+    scroll-margin-top: 80px;
 }
 
 
@@ -161,11 +228,34 @@ footer {
     right: 0;
     background-color: white;
     z-index: 50;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-bottom-left-radius: 8px;
+    border-bottom-right-radius: 8px;
 }
 
 #mobile-menu.show {
     max-height: 500px;
     transition: max-height 0.3s ease-in;
+}
+
+/* Mobile menu item spacing */
+#mobile-menu a, #mobile-menu button {
+    margin: 8px 0;
+    display: block;
+    width: 100%;
+}
+
+/* Improved mobile menu button */
+#mobile-menu-button {
+    padding: 8px;
+    border-radius: 4px;
+}
+
+/* Ensure mobile menu is properly hidden on larger screens */
+@media (min-width: 768px) {
+    #mobile-menu {
+        display: none !important;
+    }
 }
 
 #about {
@@ -279,7 +369,7 @@ footer {
     margin-bottom: 40px;
 }
 #learn{
-   
+
     background-color: #f1990b;
     border-radius: 6px;
     width: 120px;
@@ -334,7 +424,7 @@ footer {
     color: #555;
 }
 
-@media (max-width: 768px) {
+@media (max-width: 767px) {
     .contact-header h2 {
         font-size: 2rem;
     }
@@ -344,7 +434,7 @@ footer {
     }
 
     .contact-info {
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        grid-template-columns: 1fr;
     }
 
     .contact-item {
@@ -355,6 +445,70 @@ footer {
     .contact-icon {
         margin-right: 0;
         margin-bottom: 10px;
+    }
+}
+
+/* Exactly 768px - 2 columns and 2 rows layout for contact section */
+@media (width: 768px) {
+    .contact-header h2 {
+        font-size: 2rem;
+    }
+
+    .contact-header p {
+        font-size: 1rem;
+    }
+
+    /* Force 2x2 grid layout */
+    .contact-info {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: 1fr 1fr;
+        gap: 15px;
+        padding: 0 15px;
+    }
+
+    /* Keep horizontal layout for contact items */
+    .contact-item {
+        flex-direction: row;
+        text-align: left;
+        height: 100%;
+        padding: 15px;
+    }
+
+    .contact-icon {
+        margin-right: 15px;
+        margin-bottom: 0;
+        font-size: 1.3rem;
+    }
+
+    /* Adjust text size */
+    .contact-detail h3 {
+        font-size: 1.1rem;
+    }
+
+    .contact-detail p {
+        font-size: 0.9rem;
+    }
+
+    /* Adjust container and section padding */
+    #contact {
+        padding: 40px 0;
+    }
+
+    #contact .container {
+        padding: 0 20px;
+    }
+
+    /* Adjust spacing for contact header */
+    .contact-header {
+        margin-bottom: 30px;
+    }
+
+    /* Ensure the learn more button is properly sized */
+    #learn {
+        width: 110px;
+        height: 28px;
+        font-size: 0.9rem;
     }
 }
 
@@ -386,9 +540,400 @@ footer {
 .animate-pulse {
     animation: pulse 2s infinite;
 }
- /* recipe-details-css */
+ /* Comprehensive Media Queries for All Screen Sizes */
 
- @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital@0;1&display=swap');
+/* Extra Small Devices (phones, 320px and up) */
+@media (min-width: 320px) {
+    .container {
+        padding: 0 15px;
+    }
+
+    nav {
+        padding: 10px 0;
+    }
+
+    .carousel-button {
+        width: 30px;
+        height: 30px;
+        font-size: 14px;
+    }
+
+    .carousel-item {
+        padding: 0 5px;
+    }
+
+    .contact-item {
+        padding: 15px;
+    }
+
+    .contact-icon {
+        font-size: 1.2rem;
+        margin-right: 10px;
+    }
+
+    .contact-detail h3 {
+        font-size: 1rem;
+    }
+
+    .contact-detail p {
+        font-size: 0.9rem;
+    }
+
+    .footer-section {
+        min-width: 100%;
+        margin-bottom: 20px;
+    }
+
+    .footer-content {
+        flex-direction: column;
+    }
+}
+
+/* Small Devices (tablets, 576px and up) */
+@media (min-width: 576px) {
+    .container {
+        padding: 0 20px;
+    }
+
+    .carousel-button {
+        width: 35px;
+        height: 35px;
+        font-size: 16px;
+    }
+
+    .carousel-item {
+        padding: 0 8px;
+    }
+
+    .contact-item {
+        padding: 18px;
+    }
+
+    .contact-icon {
+        font-size: 1.3rem;
+        margin-right: 15px;
+    }
+
+    .contact-detail h3 {
+        font-size: 1.1rem;
+    }
+
+    .contact-detail p {
+        font-size: 0.95rem;
+    }
+
+    .footer-section {
+        min-width: 45%;
+    }
+
+    .footer-content {
+        flex-direction: row;
+        flex-wrap: wrap;
+    }
+}
+
+/* Medium Devices (tablets, 768px and up) */
+@media (min-width: 768px) {
+    .container {
+        padding: 0 30px;
+    }
+
+    .carousel-button {
+        width: 40px;
+        height: 40px;
+        font-size: 18px;
+    }
+
+    .carousel-item {
+        padding: 0 10px;
+    }
+
+    .contact-item {
+        flex-direction: row;
+        text-align: left;
+    }
+
+    .contact-icon {
+        margin-right: 20px;
+        margin-bottom: 0;
+    }
+
+    .footer-section {
+        min-width: 30%;
+    }
+}
+
+/* Large Devices (desktops, 992px and up) */
+@media (min-width: 992px) {
+    .container {
+        padding: 0 40px;
+    }
+
+    .carousel-item {
+        padding: 0 15px;
+    }
+
+    .footer-section {
+        min-width: 22%;
+    }
+}
+
+/* General styles for large screens (992px-1199px) */
+@media (min-width: 992px) and (max-width: 1199px) {
+    /* Default to 2x2 grid layout for contact section in this range */
+    .contact-info {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: auto auto;
+        gap: 20px;
+    }
+
+    /* Ensure consistent contact item styling */
+    .contact-item {
+        flex-direction: row;
+        text-align: left;
+        height: 100%;
+    }
+}
+
+/* Specific layout for 1024px screens */
+@media (width: 1024px) {
+    /* Force 2x2 grid layout for contact section */
+    .contact-info {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: 1fr 1fr;
+        gap: 20px;
+        padding: 0 20px;
+    }
+
+    /* Adjust contact items */
+    .contact-item {
+        flex-direction: row;
+        text-align: left;
+        height: 100%;
+        padding: 20px;
+    }
+
+    .contact-icon {
+        margin-right: 20px;
+        margin-bottom: 0;
+        font-size: 1.4rem;
+    }
+
+    /* Adjust text size */
+    .contact-detail h3 {
+        font-size: 1.2rem;
+    }
+
+    .contact-detail p {
+        font-size: 1rem;
+    }
+
+    /* Adjust container and section padding */
+    #contact {
+        padding: 50px 0;
+    }
+
+    #contact .container {
+        padding: 0 30px;
+    }
+
+    /* Adjust spacing for contact header */
+    .contact-header {
+        margin-bottom: 35px;
+    }
+
+    /* Ensure the learn more button is properly sized */
+    #learn {
+        width: 120px;
+        height: 30px;
+        font-size: 0.95rem;
+    }
+}
+
+/* Extra Large Devices (large desktops, 1200px and up) */
+@media (min-width: 1200px) {
+    .container {
+        max-width: 1200px;
+        padding: 0 50px;
+    }
+
+    .carousel-item {
+        padding: 0 20px;
+    }
+}
+
+/* Specific adjustments for the navigation and logout button */
+/* Mobile devices */
+@media (max-width: 767px) {
+    #signout-btn, #mobile-signout-btn {
+        font-size: 0.9rem;
+        padding: 8px 15px;
+    }
+
+    nav .container {
+        padding: 0 15px;
+    }
+
+    nav {
+        padding: 10px 0 !important;
+    }
+
+    .text-2xl {
+        font-size: 1.25rem !important;
+    }
+
+    /* Adjust mobile menu button position */
+    .flex.md\:hidden.items-center {
+        position: absolute;
+        right: 15px;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+    /* Ensure proper spacing in mobile view */
+    .h-16 {
+        height: 3rem !important;
+    }
+}
+
+/* Specific fix for screen sizes just below 768px */
+@media (min-width: 700px) and (max-width: 767px) {
+    /* Ensure mobile menu is properly displayed */
+    #mobile-menu.show {
+        max-height: 300px;
+    }
+
+    /* Adjust logo size */
+    nav .text-2xl {
+        font-size: 1.4rem !important;
+    }
+
+    /* Better spacing for mobile menu items */
+    #mobile-menu a, #mobile-menu button {
+        padding: 10px 15px;
+        margin: 5px 0;
+    }
+
+    /* Improve mobile menu button */
+    #mobile-menu-button {
+        padding: 10px;
+    }
+}
+
+/* Exactly 768px - critical breakpoint */
+@media (width: 768px) {
+    #signout-btn {
+        padding: 5px 8px !important;
+        font-size: 0.8rem !important;
+        margin-left: 2px !important;
+    }
+
+    .hidden.md\:flex.items-center.space-x-8 {
+        gap: 2px !important;
+    }
+
+    nav {
+        padding: 8px 0 !important;
+    }
+
+    /* Extreme space saving for 768px */
+    .px-3 {
+        padding-left: 0.25rem !important;
+        padding-right: 0.25rem !important;
+    }
+
+    /* Further reduce font size */
+    nav .font-medium {
+        font-size: 0.8rem !important;
+    }
+
+    /* Smaller logo */
+    nav .text-2xl {
+        font-size: 1.3rem !important;
+    }
+
+    /* Minimal container padding */
+    nav .container {
+        padding-left: 5px !important;
+        padding-right: 5px !important;
+    }
+
+    /* Minimal spacing */
+    .space-x-8 > * {
+        margin-left: 0.25rem !important;
+    }
+}
+
+/* Small tablets */
+@media (min-width: 769px) and (max-width: 991px) {
+    #signout-btn {
+        padding: 6px 10px !important;
+        font-size: 0.85rem !important;
+        margin-left: 5px !important;
+    }
+
+    .hidden.md\:flex.items-center.space-x-8 {
+        gap: 5px !important;
+    }
+
+    nav {
+        padding: 10px 0 !important;
+    }
+
+    /* Adjust spacing between nav items */
+    .px-3 {
+        padding-left: 0.35rem !important;
+        padding-right: 0.35rem !important;
+    }
+
+    /* Reduce font size for nav items */
+    nav .font-medium {
+        font-size: 0.85rem !important;
+    }
+
+    /* Adjust logo size */
+    nav .text-2xl {
+        font-size: 1.4rem !important;
+    }
+
+    /* Ensure proper spacing in navbar */
+    .h-16 {
+        height: 3.5rem !important;
+    }
+
+    /* Adjust container padding */
+    nav .container {
+        padding-left: 10px !important;
+        padding-right: 10px !important;
+    }
+
+    /* Fix spacing issues */
+    .space-x-8 > * {
+        margin-left: 0.5rem !important;
+    }
+}
+
+/* Larger tablets and small desktops */
+@media (min-width: 992px) and (max-width: 1199px) {
+    nav {
+        padding: 15px 0 !important;
+    }
+
+    /* Better spacing for navigation items */
+    .space-x-8 > * {
+        margin-left: 1.5rem !important;
+    }
+
+    .space-x-8 > *:first-child {
+        margin-left: 0 !important;
+    }
+}
+
+/* recipe-details-css */
+
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital@0;1&display=swap');
 
  .back-btn {
      background-color: #f4b266;
