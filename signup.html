@@ -98,13 +98,17 @@
             auth.signInAnonymously()
                 .then((userCredential) => {
                     const user = userCredential.user;
+                    
+                    // Generate a random guest name for better identification
+                    const guestName = "Guest_" + Math.floor(Math.random() * 10000);
 
-                    // Create a guest user profile in Firestore
+                    // Create a guest user profile in Firestore with proper fields
                     return db.collection('users').doc(user.uid).set({
-                        name: "Guest User",
+                        name: guestName,
                         email: "guest@example.com",
                         isGuest: true,
-                        createdAt: firebase.firestore.FieldValue.serverTimestamp()
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        lastLogin: firebase.firestore.FieldValue.serverTimestamp()
                     });
                 })
                 .then(() => {
